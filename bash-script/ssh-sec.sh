@@ -1,13 +1,12 @@
 #!/bin/bash
 
-# Backup the original SSH configuration file
-sudo cp /etc/ssh/ssh_config /etc/ssh/ssh_config.bak
+# Backup the original SSH server configuration file
+sudo cp /etc/ssh/sshd_config /etc/ssh/sshd_config.bak
 
-# Set timeout and connection attempts
-sudo tee /etc/ssh/ssh_config > /dev/null << EOF
-Host *
-    ConnectTimeout 10
-    ConnectionAttempts 3
-EOF
+# Set MaxAuthTries to 3
+sudo sed -i 's/#MaxAuthTries.*/MaxAuthTries 3/' /etc/ssh/sshd_config
 
-echo "SSH configuration updated successfully."
+# Restart SSH service to apply changes
+sudo systemctl restart ssh
+
+echo "MaxAuthTries set to 3 in SSH server configuration."
