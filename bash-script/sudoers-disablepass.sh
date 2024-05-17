@@ -22,7 +22,8 @@ fi
 
 echo "Create New Sudo User"
 echo "==========="
-read -p "Enter Username :" USERNAME 
+read -p "Enter Username :" USERNAME
+sudo adduser $USERNAME --disabled-password -q
 mkdir /home/$USERNAME/.ssh
 read -p "Enter your public key: " PUBKEY
 echo "$PUBKEY" >> /home/$USERNAME/.ssh/authorized_keys
