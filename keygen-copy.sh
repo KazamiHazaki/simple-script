@@ -6,10 +6,18 @@ if [[ $# -ne 2 ]]; then
     exit 1
 fi
 
-# Variables
+# Variables for remote user and host
 REMOTE_USER="$1"
 REMOTE_HOST="$2"
-SSH_KEY_PATH="$HOME/.ssh/id_rsa"
+SSH_KEY_PATH="/tmp/semaphore/.ssh/id_rsa"
+
+# Ensure the .ssh directory exists
+SSH_DIR=$(dirname "$SSH_KEY_PATH")
+if [[ ! -d "$SSH_DIR" ]]; then
+    echo "Creating directory $SSH_DIR..."
+    mkdir -p "$SSH_DIR"
+    chmod 700 "$SSH_DIR"
+fi
 
 # Generate SSH key pair if it doesn't exist
 if [[ ! -f "$SSH_KEY_PATH" ]]; then
@@ -21,8 +29,13 @@ else
 fi
 
 # Copy the public key to the remote server
-echo "Copying the public key to $REMOTE_USER@$REMOTE_HOST..."
-ssh-copy-id -i "$SSH_KEY_PATH.pub" "$REMOTE_USER@$REMOTE_HOST"
+if [[ -f "$SSH_KEY_PATH.pub" ]]; then
+    echo "Copying the public key to $REMOTE_USER@$REMOTE_HOST..."
+    ssh-copy-id -i "$SSH_KEY_PATH.pub" "$REMOTE_USER@$REMOTE_HOST"
+else
+    echo "Error: Public key file $SSH_KEY_PATH.pub not found!"
+    exit 1
+fi
 
 # Verify the connection
 echo "Verifying SSH connection to $REMOTE_USER@$REMOTE_HOST..."
