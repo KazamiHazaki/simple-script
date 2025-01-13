@@ -19,10 +19,10 @@ if [[ ! -d "$SSH_DIR" ]]; then
     chmod 700 "$SSH_DIR"
 fi
 
-# Generate SSH key pair if it doesn't exist
+# Generate SSH key pair non-interactively if it doesn't exist
 if [[ ! -f "$SSH_KEY_PATH" ]]; then
-    echo "Generating a new SSH key pair..."
-    ssh-keygen -t rsa -b 4096 -f "$SSH_KEY_PATH" -N "" -q
+    echo "Generating a new SSH key pair non-interactively..."
+    ssh-keygen -t rsa -b 4096 -f "$SSH_KEY_PATH" -N "" -q <<< y > /dev/null 2>&1
     echo "SSH key pair generated at $SSH_KEY_PATH."
 else
     echo "SSH key pair already exists at $SSH_KEY_PATH."
