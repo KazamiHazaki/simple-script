@@ -1,0 +1,45 @@
+services:
+  jenkins:
+    container_name: jenkins-2025
+    restart: on-failure
+    image: jenkins/jenkins:latest-jdk21
+    networks:
+      jenkins:
+        aliases:
+          - jenkins-lts
+    environment:
+      - DOCKER_HOST=tcp://docker:2376
+      - DOCKER_CERT_PATH=/certs/client
+      - DOCKER_TLS_VERIFY=1
+    ports:
+      - "8090:8080"
+      - "38191:38171"
+      - "59000:50000"
+    volumes:
+      - jenkins-storage:/var/jenkins_home
+      - jenkins-certs:/certs/client:ro
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /usr/bin/docker:/usr/bin/docker
+  dind-jenkins:
+    image: docker:dind
+    container_name: dind-jenkins
+    privileged: true
+    environment:
+      DOCKER_TLS_CERTDIR: /certs
+    volumes:
+      - jenkins-certs:/certs/client
+      - jenkins-storage:/var/jenkins_home
+    networks:
+      jenkins:
+        aliases:
+          - docker
+    ports:
+      - 2378:2376
+    command: --storage-driver overlay2
+
+networks:
+ jenkins:
+
+volumes:
+ jenkins-storage:
+ jenkins-certs:
